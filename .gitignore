@@ -18,12 +18,14 @@
 
 # Libraries
 *.lib
+!libusb-1.0.lib
 *.a
 *.la
 *.lo
 
 # Shared objects (inc. Windows DLLs)
 *.dll
+!libusb-1.0.dll
 *.so
 *.so.*
 *.dylib

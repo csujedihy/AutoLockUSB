@@ -8,32 +8,7 @@ static boolean plugged = FALSE;
 static int MY_PRODUCT_ID = -1;
 static int MY_VENDOR_ID = -1;
 
-int hotplug_callback(struct libusb_context *ctx, struct libusb_device *dev,
-	libusb_hotplug_event event, void *user_data) {
-	static libusb_device_handle *handle = NULL;
-	struct libusb_device_descriptor desc;
-	int rc;
-	(void)libusb_get_device_descriptor(dev, &desc);
-	if (LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED == event) {
-		rc = libusb_open(dev, &handle);
-		if (LIBUSB_SUCCESS != rc) {
-			printf("Could not open USB device\n");
-		}
-	}
-	else if (LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT == event) {
-		if (handle) {
-			libusb_close(handle);
-			handle = NULL;
-		}
-	}
-	else {
-		printf("Unhandled event %d\n", event);
-	}
-	count++;
-	return 0;
-}
-
-void lockscreen() {
+inline void lockscreen() {
 	LockWorkStation();
 }
 
@@ -58,15 +33,17 @@ int chooseDevices() {
 		vids[i] = desc.idVendor;
 		unsigned char product[200] = { 0 };
 		unsigned char manufacturer[200] = { 0 };
+		unsigned char serial_number[200] = { 0 };
+
 		if (libusb_open(device, &handle) == 0) {
-			libusb_get_string_descriptor_ascii(handle, desc.iManufacturer,
-				manufacturer, 200);
-			libusb_get_string_descriptor_ascii(handle, desc.iProduct,
-				product, 200);
+			libusb_get_string_descriptor_ascii(handle, desc.iManufacturer, manufacturer, 200);
+			libusb_get_string_descriptor_ascii(handle, desc.iProduct, product, 200);
+			libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial_number, 200);
+
 			libusb_close(handle);
 		}
 		
-		printf("%d. %d:%d %s %s\n", i, desc.idProduct, desc.idVendor, manufacturer, product);
+		printf("%d. %d:%d %s %s %s\n", i, desc.idProduct, desc.idVendor, manufacturer, product, serial_number);
 	}
 
 	printf("Please select from 0-%lld: ", cnt - 1);
