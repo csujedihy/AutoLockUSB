@@ -33,13 +33,10 @@ int chooseDevices() {
 		vids[i] = desc.idVendor;
 		unsigned char product[200] = { 0 };
 		unsigned char manufacturer[200] = { 0 };
-		unsigned char serial_number[200] = { 0 };
 
 		if (libusb_open(device, &handle) == 0) {
 			libusb_get_string_descriptor_ascii(handle, desc.iManufacturer, manufacturer, 200);
 			libusb_get_string_descriptor_ascii(handle, desc.iProduct, product, 200);
-			libusb_get_string_descriptor_ascii(handle, desc.iSerialNumber, serial_number, 200);
-
 			libusb_close(handle);
 		}
 		
